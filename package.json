@@ -1,5 +1,5 @@
 {
-  "name": "hypercerts-dev",
+  "name": "@network-goods/hypercerts-graph",
   "license": "UNLICENSED",
   "scripts": {
     "codegen": "graph codegen",

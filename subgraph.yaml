@@ -8,6 +8,7 @@ dataSources:
     source:
       address: "0xcC08266250930E98256182734913Bf1B36102072"
       abi: Proxy
+      startBlock: 8100251
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -27,3 +28,59 @@ dataSources:
         - event: Upgraded(indexed address)
           handler: handleUpgraded
       file: ./src/proxy.ts
+  - kind: ethereum
+    name: HypercertMinter
+    network: goerli
+    source:
+      address: "0xb175b2B2e443058D208356DbF34c9C734AC8b99D"
+      abi: HypercertMinter
+      startBlock: 8100251
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - HypercertMinterAdminChanged
+        - AllowlistCreated
+        - ApprovalForAll
+        - HypercertMinterBeaconUpgraded
+        - ClaimStored
+        - Initialized
+        - LeafClaimed
+        - OwnershipTransferred
+        - TransferBatch
+        - TransferSingle
+        - URI
+        - HypercertMinterUpgraded
+        - ValueTransfer
+      abis:
+        - name: HypercertMinter
+          file: ./abis/HypercertMinter.json
+      eventHandlers:
+        - event: HypercertMinterAdminChanged(address,address)
+          handler: handleHypercertMinterAdminChanged
+        - event: AllowlistCreated(uint256,bytes32)
+          handler: handleAllowlistCreated
+        - event: ApprovalForAll(indexed address,indexed address,bool)
+          handler: handleApprovalForAll
+        - event: HypercertMinterBeaconUpgraded(indexed address)
+          handler: handleHypercertMinterBeaconUpgraded
+        - event: ClaimStored(indexed uint256,string)
+          handler: handleClaimStored
+        - event: Initialized(uint8)
+          handler: handleInitialized
+        - event: LeafClaimed(uint256,bytes32)
+          handler: handleLeafClaimed
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: TransferBatch(indexed address,indexed address,indexed address,uint256[],uint256[])
+          handler: handleTransferBatch
+        - event: TransferSingle(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleTransferSingle
+        - event: URI(string,indexed uint256)
+          handler: handleURI
+        - event: HypercertMinterUpgraded(indexed address)
+          handler: handleHypercertMinterUpgraded
+        - event: ValueTransfer(uint256,uint256,uint256)
+          handler: handleValueTransfer
+      file: ./src/hypercert-minter.ts
