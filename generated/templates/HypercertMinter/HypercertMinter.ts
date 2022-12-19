@@ -10,16 +10,16 @@ import {
   BigInt
 } from "@graphprotocol/graph-ts";
 
-export class HypercertMinterAdminChanged extends ethereum.Event {
-  get params(): HypercertMinterAdminChanged__Params {
-    return new HypercertMinterAdminChanged__Params(this);
+export class AdminChanged extends ethereum.Event {
+  get params(): AdminChanged__Params {
+    return new AdminChanged__Params(this);
   }
 }
 
-export class HypercertMinterAdminChanged__Params {
-  _event: HypercertMinterAdminChanged;
+export class AdminChanged__Params {
+  _event: AdminChanged;
 
-  constructor(event: HypercertMinterAdminChanged) {
+  constructor(event: AdminChanged) {
     this._event = event;
   }
 
@@ -45,7 +45,7 @@ export class AllowlistCreated__Params {
     this._event = event;
   }
 
-  get claimID(): BigInt {
+  get tokenID(): BigInt {
     return this._event.parameters[0].value.toBigInt();
   }
 
@@ -80,16 +80,16 @@ export class ApprovalForAll__Params {
   }
 }
 
-export class HypercertMinterBeaconUpgraded extends ethereum.Event {
-  get params(): HypercertMinterBeaconUpgraded__Params {
-    return new HypercertMinterBeaconUpgraded__Params(this);
+export class BeaconUpgraded extends ethereum.Event {
+  get params(): BeaconUpgraded__Params {
+    return new BeaconUpgraded__Params(this);
   }
 }
 
-export class HypercertMinterBeaconUpgraded__Params {
-  _event: HypercertMinterBeaconUpgraded;
+export class BeaconUpgraded__Params {
+  _event: BeaconUpgraded;
 
-  constructor(event: HypercertMinterBeaconUpgraded) {
+  constructor(event: BeaconUpgraded) {
     this._event = event;
   }
 
@@ -117,6 +117,10 @@ export class ClaimStored__Params {
 
   get uri(): string {
     return this._event.parameters[1].value.toString();
+  }
+
+  get totalUnits(): BigInt {
+    return this._event.parameters[2].value.toBigInt();
   }
 }
 
@@ -151,7 +155,7 @@ export class LeafClaimed__Params {
     this._event = event;
   }
 
-  get claimID(): BigInt {
+  get tokenID(): BigInt {
     return this._event.parameters[0].value.toBigInt();
   }
 
@@ -272,16 +276,16 @@ export class URI__Params {
   }
 }
 
-export class HypercertMinterUpgraded extends ethereum.Event {
-  get params(): HypercertMinterUpgraded__Params {
-    return new HypercertMinterUpgraded__Params(this);
+export class Upgraded extends ethereum.Event {
+  get params(): Upgraded__Params {
+    return new Upgraded__Params(this);
   }
 }
 
-export class HypercertMinterUpgraded__Params {
-  _event: HypercertMinterUpgraded;
+export class Upgraded__Params {
+  _event: Upgraded;
 
-  constructor(event: HypercertMinterUpgraded) {
+  constructor(event: Upgraded) {
     this._event = event;
   }
 
@@ -303,16 +307,20 @@ export class ValueTransfer__Params {
     this._event = event;
   }
 
-  get fromTokenID(): BigInt {
+  get claimID(): BigInt {
     return this._event.parameters[0].value.toBigInt();
   }
 
-  get toTokenID(): BigInt {
+  get fromTokenID(): BigInt {
     return this._event.parameters[1].value.toBigInt();
   }
 
-  get value(): BigInt {
+  get toTokenID(): BigInt {
     return this._event.parameters[2].value.toBigInt();
+  }
+
+  get value(): BigInt {
+    return this._event.parameters[3].value.toBigInt();
   }
 }
 
@@ -370,50 +378,28 @@ export class HypercertMinter extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  balanceOf(_owner: Address, _tokenID: BigInt): BigInt {
+  balanceOf(account: Address, id: BigInt): BigInt {
     let result = super.call(
       "balanceOf",
       "balanceOf(address,uint256):(uint256)",
       [
-        ethereum.Value.fromAddress(_owner),
-        ethereum.Value.fromUnsignedBigInt(_tokenID)
+        ethereum.Value.fromAddress(account),
+        ethereum.Value.fromUnsignedBigInt(id)
       ]
     );
 
     return result[0].toBigInt();
   }
 
-  try_balanceOf(
-    _owner: Address,
-    _tokenID: BigInt
-  ): ethereum.CallResult<BigInt> {
+  try_balanceOf(account: Address, id: BigInt): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
       "balanceOf",
       "balanceOf(address,uint256):(uint256)",
       [
-        ethereum.Value.fromAddress(_owner),
-        ethereum.Value.fromUnsignedBigInt(_tokenID)
+        ethereum.Value.fromAddress(account),
+        ethereum.Value.fromUnsignedBigInt(id)
       ]
     );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  balanceOf1(_tokenID: BigInt): BigInt {
-    let result = super.call("balanceOf", "balanceOf(uint256):(uint256)", [
-      ethereum.Value.fromUnsignedBigInt(_tokenID)
-    ]);
-
-    return result[0].toBigInt();
-  }
-
-  try_balanceOf1(_tokenID: BigInt): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("balanceOf", "balanceOf(uint256):(uint256)", [
-      ethereum.Value.fromUnsignedBigInt(_tokenID)
-    ]);
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -582,6 +568,25 @@ export class HypercertMinter extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
+  ownerOf(tokenID: BigInt): Address {
+    let result = super.call("ownerOf", "ownerOf(uint256):(address)", [
+      ethereum.Value.fromUnsignedBigInt(tokenID)
+    ]);
+
+    return result[0].toAddress();
+  }
+
+  try_ownerOf(tokenID: BigInt): ethereum.CallResult<Address> {
+    let result = super.tryCall("ownerOf", "ownerOf(uint256):(address)", [
+      ethereum.Value.fromUnsignedBigInt(tokenID)
+    ]);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
   proxiableUUID(): Bytes {
     let result = super.call("proxiableUUID", "proxiableUUID():(bytes32)", []);
 
@@ -624,27 +629,6 @@ export class HypercertMinter extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
-  totalSupply(_typeID: BigInt): BigInt {
-    let result = super.call("totalSupply", "totalSupply(uint256):(uint256)", [
-      ethereum.Value.fromUnsignedBigInt(_typeID)
-    ]);
-
-    return result[0].toBigInt();
-  }
-
-  try_totalSupply(_typeID: BigInt): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "totalSupply",
-      "totalSupply(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(_typeID)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
   typeCounter(): BigInt {
     let result = super.call("typeCounter", "typeCounter():(uint256)", []);
 
@@ -653,6 +637,50 @@ export class HypercertMinter extends ethereum.SmartContract {
 
   try_typeCounter(): ethereum.CallResult<BigInt> {
     let result = super.tryCall("typeCounter", "typeCounter():(uint256)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  unitsOf(account: Address, tokenID: BigInt): BigInt {
+    let result = super.call("unitsOf", "unitsOf(address,uint256):(uint256)", [
+      ethereum.Value.fromAddress(account),
+      ethereum.Value.fromUnsignedBigInt(tokenID)
+    ]);
+
+    return result[0].toBigInt();
+  }
+
+  try_unitsOf(account: Address, tokenID: BigInt): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "unitsOf",
+      "unitsOf(address,uint256):(uint256)",
+      [
+        ethereum.Value.fromAddress(account),
+        ethereum.Value.fromUnsignedBigInt(tokenID)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  unitsOf1(tokenID: BigInt): BigInt {
+    let result = super.call("unitsOf", "unitsOf(uint256):(uint256)", [
+      ethereum.Value.fromUnsignedBigInt(tokenID)
+    ]);
+
+    return result[0].toBigInt();
+  }
+
+  try_unitsOf1(tokenID: BigInt): ethereum.CallResult<BigInt> {
+    let result = super.tryCall("unitsOf", "unitsOf(uint256):(uint256)", [
+      ethereum.Value.fromUnsignedBigInt(tokenID)
+    ]);
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -1021,7 +1049,7 @@ export class MintClaimFromAllowlistCall__Inputs {
     return this._call.inputValues[1].value.toBigInt();
   }
 
-  get amount(): BigInt {
+  get units(): BigInt {
     return this._call.inputValues[2].value.toBigInt();
   }
 }
@@ -1051,12 +1079,16 @@ export class MintClaimWithFractionsCall__Inputs {
     this._call = call;
   }
 
+  get units(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
   get fractions(): Array<BigInt> {
-    return this._call.inputValues[0].value.toBigIntArray();
+    return this._call.inputValues[1].value.toBigIntArray();
   }
 
   get uri(): string {
-    return this._call.inputValues[1].value.toString();
+    return this._call.inputValues[2].value.toString();
   }
 }
 
