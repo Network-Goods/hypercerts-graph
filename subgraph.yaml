@@ -3,31 +3,12 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: UUPSUpgradeable
-    network: goerli
-    source:
-      address: "0xcC08266250930E98256182734913Bf1B36102072"
-      abi: UUPSUpgradeable
-      startBlock: 8100246
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      file: ./src/proxy.ts
-      entities:
-        - Implementation
-      abis:
-        - name: UUPSUpgradeable
-          file: ./abis/UUPSUpgradeable.json
-      eventHandlers:
-        - event: Upgraded(indexed address)
-          handler: handleUpgraded
-templates:
-  - kind: ethereum/contract
     name: HypercertMinter
     network: goerli
     source:
+      address: "0xcC08266250930E98256182734913Bf1B36102072"
       abi: HypercertMinter
+      startBlock: 8100246
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

@@ -13,7 +13,9 @@ import {
 import { getClaimID, getOrCreateClaim, getOrCreateClaimToken } from "./utils";
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 
-const ZERO_ADDRESS = Address.fromHexString("0x0");
+const ZERO_ADDRESS = Address.fromString(
+  "0x0000000000000000000000000000000000000000"
+);
 const ZERO_TOKEN = BigInt.fromI32(0);
 
 export function handleAllowlistCreated(event: AllowlistCreatedEvent): void {}
@@ -60,18 +62,18 @@ export function handleValueTransfer(event: ValueTransferEvent): void {
   from.claim = claimID;
 
   // New mint
-  if (from.tokenID.equals(ZERO_TOKEN) && to.tokenID.notEqual(ZERO_TOKEN)) {
+  if (from.tokenID.isZero() && !to.tokenID.isZero()) {
     to.units = value;
   }
 
   // Units transfer
-  if (from.tokenID.notEqual(ZERO_TOKEN) && to.tokenID.notEqual(ZERO_TOKEN)) {
+  if (!from.tokenID.isZero() && !to.tokenID.isZero()) {
     from.units.minus(value);
     to.units.plus(value);
   }
 
   // Burn value
-  if (from.tokenID.notEqual(ZERO_TOKEN) && to.tokenID.equals(ZERO_TOKEN)) {
+  if (!from.tokenID.isZero() && to.tokenID.isZero()) {
     from.units.minus(value);
   }
 
