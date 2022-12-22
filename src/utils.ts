@@ -1,40 +1,47 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
-import { Claim, ClaimFraction } from "../generated/schema";
+import { Address, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
+import { Claim, ClaimToken } from "../generated/schema";
+import { HypercertMinter } from "../generated/templates/HypercertMinter/HypercertMinter";
 
-export function getClaimID(claimID: BigInt, contract: Address): string {
-  return contract.toHexString().concat(claimID.toHexString());
+export function getID(tokenID: BigInt, contract: Address): string {
+  return contract.toHexString().concat(tokenID.toHexString());
 }
 
 export function getOrCreateClaim(claimID: BigInt, contract: Address): Claim {
-  let id = getClaimID(claimID, contract);
+  let id = getID(claimID, contract);
   let claim = Claim.load(id);
 
-  if (claim != null) {
-    return claim;
-  }
+  log.debug("Created claimID: {}", [id]);
 
-  claim = new Claim(id);
-  claim.contract = contract.toHexString();
-  claim.save();
+  if (claim == null) {
+    claim = new Claim(id);
+    claim.contract = contract.toHexString();
+    claim.save();
+  }
 
   return claim;
 }
 
 export function getOrCreateClaimToken(
+  claimID: BigInt,
   tokenID: BigInt,
   contract: Address
-): ClaimFraction {
-  let id = contract.toHexString().concat(tokenID.toHexString());
-  let fraction = ClaimFraction.load(id);
+): ClaimToken {
+  let minterContract = HypercertMinter.bind(contract);
 
-  if (fraction != null) {
-    return fraction;
+  let id = getID(tokenID, contract);
+  let fraction = ClaimToken.load(id);
+  let claim = getOrCreateClaim(claimID, contract);
+
+  if (fraction == null) {
+    let owner = minterContract.ownerOf(tokenID);
+
+    fraction = new ClaimToken(id);
+    fraction.owner = owner;
+    fraction.claim = claim.id;
+    fraction.tokenID = tokenID;
+    fraction.units = BigInt.fromI32(0);
+    fraction.save();
   }
-
-  fraction = new ClaimFraction(id);
-  fraction.tokenID = tokenID;
-  fraction.units = BigInt.fromI32(0);
-  fraction.save();
 
   return fraction;
 }

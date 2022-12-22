@@ -7,10 +7,10 @@ type Claim @entity {
   totalUnits: BigInt
 }
 
-type ClaimFraction @entity {
+type ClaimToken @entity {
   id: String!
   tokenID: BigInt!
-  claim: Claim
-  owner: Bytes
+  claim: Claim!
+  owner: Bytes!
   units: BigInt!
 }

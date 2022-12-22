@@ -10,8 +10,9 @@ import {
   URI as URIEvent,
   ValueTransfer as ValueTransferEvent,
 } from "../generated/templates/HypercertMinter/HypercertMinter";
-import { getClaimID, getOrCreateClaim, getOrCreateClaimToken } from "./utils";
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { getID, getOrCreateClaim, getOrCreateClaimToken } from "./utils";
+import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import { ClaimToken } from "../generated/schema";
 
 const ZERO_ADDRESS = Address.fromString(
   "0x0000000000000000000000000000000000000000"
@@ -44,7 +45,14 @@ export function handleOwnershipTransferred(
 export function handleTransferBatch(event: TransferBatchEvent): void {}
 
 export function handleTransferSingle(event: TransferSingleEvent): void {
-  let token = getOrCreateClaimToken(event.params.id, event.params.from);
+  let id = getID(event.params.id, event.address);
+  let token = ClaimToken.load(id);
+
+  if (!token) {
+    log.debug("Transfered ClaimToken does not exist: {}", [id]);
+    return;
+  }
+
   token.owner = event.params.to;
   token.save();
 }
@@ -52,14 +60,18 @@ export function handleTransferSingle(event: TransferSingleEvent): void {
 export function handleURI(event: URIEvent): void {}
 
 export function handleValueTransfer(event: ValueTransferEvent): void {
-  let from = getOrCreateClaimToken(event.params.fromTokenID, event.address);
-  let to = getOrCreateClaimToken(event.params.toTokenID, event.address);
+  let from = getOrCreateClaimToken(
+    event.params.claimID,
+    event.params.fromTokenID,
+    event.address
+  );
+  let to = getOrCreateClaimToken(
+    event.params.claimID,
+    event.params.toTokenID,
+    event.address
+  );
 
   let value = event.params.value;
-
-  let claimID = getClaimID(event.params.claimID, event.address);
-  to.claim = claimID;
-  from.claim = claimID;
 
   // New mint
   if (from.tokenID.isZero() && !to.tokenID.isZero()) {
@@ -76,6 +88,9 @@ export function handleValueTransfer(event: ValueTransferEvent): void {
   if (!from.tokenID.isZero() && to.tokenID.isZero()) {
     from.units.minus(value);
   }
+
+  log.debug("Saving from: {}", [from.id]);
+  log.debug("Saving to: {}", [to.id]);
 
   from.save();
   to.save();

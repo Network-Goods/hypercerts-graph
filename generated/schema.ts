@@ -120,7 +120,7 @@ export class Claim extends Entity {
   }
 }
 
-export class ClaimFraction extends Entity {
+export class ClaimToken extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
@@ -128,18 +128,18 @@ export class ClaimFraction extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id != null, "Cannot save ClaimFraction entity without an ID");
+    assert(id != null, "Cannot save ClaimToken entity without an ID");
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        `Entities of type ClaimFraction must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+        `Entities of type ClaimToken must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
       );
-      store.set("ClaimFraction", id.toString(), this);
+      store.set("ClaimToken", id.toString(), this);
     }
   }
 
-  static load(id: string): ClaimFraction | null {
-    return changetype<ClaimFraction | null>(store.get("ClaimFraction", id));
+  static load(id: string): ClaimToken | null {
+    return changetype<ClaimToken | null>(store.get("ClaimToken", id));
   }
 
   get id(): string {
@@ -160,38 +160,22 @@ export class ClaimFraction extends Entity {
     this.set("tokenID", Value.fromBigInt(value));
   }
 
-  get claim(): string | null {
+  get claim(): string {
     let value = this.get("claim");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
+    return value!.toString();
   }
 
-  set claim(value: string | null) {
-    if (!value) {
-      this.unset("claim");
-    } else {
-      this.set("claim", Value.fromString(<string>value));
-    }
+  set claim(value: string) {
+    this.set("claim", Value.fromString(value));
   }
 
-  get owner(): Bytes | null {
+  get owner(): Bytes {
     let value = this.get("owner");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBytes();
-    }
+    return value!.toBytes();
   }
 
-  set owner(value: Bytes | null) {
-    if (!value) {
-      this.unset("owner");
-    } else {
-      this.set("owner", Value.fromBytes(<Bytes>value));
-    }
+  set owner(value: Bytes) {
+    this.set("owner", Value.fromBytes(value));
   }
 
   get units(): BigInt {
