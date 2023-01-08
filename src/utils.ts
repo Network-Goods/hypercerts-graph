@@ -1,9 +1,29 @@
 import { Address, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
-import { Claim, ClaimToken } from "../generated/schema";
+import { Allowlist, Claim, ClaimToken } from "../generated/schema";
 import { HypercertMinter } from "../generated/templates/HypercertMinter/HypercertMinter";
 
 export function getID(tokenID: BigInt, contract: Address): string {
   return contract.toHexString().concat(tokenID.toHexString());
+}
+
+export function getOrCreateAllowlist(
+  claimID: BigInt,
+  root: Bytes,
+  contract: Address
+): Allowlist {
+  let id = getID(claimID, contract);
+  let list = Allowlist.load(id);
+
+  log.debug("Created claimID: {}", [id]);
+
+  if (list == null) {
+    list = new Allowlist(id);
+    list.root = root;
+    list.claim = getOrCreateClaim(claimID, contract).id;
+    list.save();
+  }
+
+  return list;
 }
 
 export function getOrCreateClaim(claimID: BigInt, contract: Address): Claim {
@@ -14,6 +34,7 @@ export function getOrCreateClaim(claimID: BigInt, contract: Address): Claim {
 
   if (claim == null) {
     claim = new Claim(id);
+    claim.tokenID = claimID;
     claim.contract = contract.toHexString();
     claim.save();
   }

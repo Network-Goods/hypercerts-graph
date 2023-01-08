@@ -1,5 +1,12 @@
+type Allowlist @entity {
+  id: String!
+  root: Bytes!
+  claim: Claim!
+}
+
 type Claim @entity {
   id: String!
+  tokenID: BigInt!
   contract: String!
   uri: String
   creator: Bytes

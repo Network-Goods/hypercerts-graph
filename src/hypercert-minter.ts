@@ -10,7 +10,12 @@ import {
   URI as URIEvent,
   ValueTransfer as ValueTransferEvent,
 } from "../generated/templates/HypercertMinter/HypercertMinter";
-import { getID, getOrCreateClaim, getOrCreateClaimToken } from "./utils";
+import {
+  getID,
+  getOrCreateAllowlist,
+  getOrCreateClaim,
+  getOrCreateClaimToken,
+} from "./utils";
 import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 import { ClaimToken } from "../generated/schema";
 
@@ -19,7 +24,15 @@ const ZERO_ADDRESS = Address.fromString(
 );
 const ZERO_TOKEN = BigInt.fromI32(0);
 
-export function handleAllowlistCreated(event: AllowlistCreatedEvent): void {}
+export function handleAllowlistCreated(event: AllowlistCreatedEvent): void {
+  let allowlist = getOrCreateAllowlist(
+    event.params.tokenID,
+    event.params.root,
+    event.address
+  );
+
+  allowlist.save();
+}
 
 export function handleApprovalForAll(event: ApprovalForAllEvent): void {}
 
