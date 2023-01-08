@@ -1,3 +1,9 @@
+type Allowlist @entity {
+  id: String!
+  root: Bytes!
+  claim: Claim!
+}
+
 type Claim @entity {
   id: String!
   contract: String!

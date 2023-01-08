@@ -517,7 +517,7 @@
       },
       {
         "internalType": "string",
-        "name": "uri",
+        "name": "_uri",
         "type": "string"
       }
     ],
@@ -632,7 +632,7 @@
       },
       {
         "internalType": "string",
-        "name": "uri",
+        "name": "_uri",
         "type": "string"
       }
     ],
@@ -678,7 +678,7 @@
       },
       {
         "internalType": "string",
-        "name": "uri",
+        "name": "_uri",
         "type": "string"
       }
     ],

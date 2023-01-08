@@ -11,6 +11,56 @@ import {
   BigDecimal
 } from "@graphprotocol/graph-ts";
 
+export class Allowlist extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save Allowlist entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type Allowlist must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("Allowlist", id.toString(), this);
+    }
+  }
+
+  static load(id: string): Allowlist | null {
+    return changetype<Allowlist | null>(store.get("Allowlist", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get root(): Bytes {
+    let value = this.get("root");
+    return value!.toBytes();
+  }
+
+  set root(value: Bytes) {
+    this.set("root", Value.fromBytes(value));
+  }
+
+  get claim(): string {
+    let value = this.get("claim");
+    return value!.toString();
+  }
+
+  set claim(value: string) {
+    this.set("claim", Value.fromString(value));
+  }
+}
+
 export class Claim extends Entity {
   constructor(id: string) {
     super();

@@ -921,7 +921,7 @@ export class CreateAllowlistCall__Inputs {
     return this._call.inputValues[1].value.toBytes();
   }
 
-  get uri(): string {
+  get _uri(): string {
     return this._call.inputValues[2].value.toString();
   }
 }
@@ -1011,7 +1011,7 @@ export class MintClaimCall__Inputs {
     return this._call.inputValues[0].value.toBigInt();
   }
 
-  get uri(): string {
+  get _uri(): string {
     return this._call.inputValues[1].value.toString();
   }
 }
@@ -1087,7 +1087,7 @@ export class MintClaimWithFractionsCall__Inputs {
     return this._call.inputValues[1].value.toBigIntArray();
   }
 
-  get uri(): string {
+  get _uri(): string {
     return this._call.inputValues[2].value.toString();
   }
 }
