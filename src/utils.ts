@@ -34,6 +34,7 @@ export function getOrCreateClaim(claimID: BigInt, contract: Address): Claim {
 
   if (claim == null) {
     claim = new Claim(id);
+    claim.tokenID = claimID;
     claim.contract = contract.toHexString();
     claim.save();
   }

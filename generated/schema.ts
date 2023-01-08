@@ -92,6 +92,15 @@ export class Claim extends Entity {
     this.set("id", Value.fromString(value));
   }
 
+  get tokenID(): BigInt {
+    let value = this.get("tokenID");
+    return value!.toBigInt();
+  }
+
+  set tokenID(value: BigInt) {
+    this.set("tokenID", Value.fromBigInt(value));
+  }
+
   get contract(): string {
     let value = this.get("contract");
     return value!.toString();
