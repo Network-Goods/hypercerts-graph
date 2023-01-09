@@ -3,7 +3,7 @@ import { Allowlist, Claim, ClaimToken } from "../generated/schema";
 import { HypercertMinter } from "../generated/templates/HypercertMinter/HypercertMinter";
 
 export function getID(tokenID: BigInt, contract: Address): string {
-  return contract.toHexString().concat(tokenID.toHexString());
+  return contract.toHexString().concat("-".concat(tokenID.toString()));
 }
 
 export function getOrCreateAllowlist(
@@ -26,7 +26,11 @@ export function getOrCreateAllowlist(
   return list;
 }
 
-export function getOrCreateClaim(claimID: BigInt, contract: Address): Claim {
+export function getOrCreateClaim(
+  claimID: BigInt,
+  contract: Address,
+  timestamp: BigInt = BigInt.fromI32(0)
+): Claim {
   let id = getID(claimID, contract);
   let claim = Claim.load(id);
 
@@ -34,6 +38,9 @@ export function getOrCreateClaim(claimID: BigInt, contract: Address): Claim {
 
   if (claim == null) {
     claim = new Claim(id);
+    if (timestamp) {
+      claim.creation = timestamp;
+    }
     claim.tokenID = claimID;
     claim.contract = contract.toHexString();
     claim.save();
