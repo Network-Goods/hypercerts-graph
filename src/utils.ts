@@ -19,7 +19,7 @@ export function getOrCreateAllowlist(
   if (list == null) {
     list = new Allowlist(id);
     list.root = root;
-    list.claim = getOrCreateClaim(claimID, contract).id;
+    list.claim = getID(claimID, contract);
     list.save();
   }
 
@@ -29,7 +29,7 @@ export function getOrCreateAllowlist(
 export function getOrCreateClaim(
   claimID: BigInt,
   contract: Address,
-  timestamp: BigInt = BigInt.fromI32(0)
+  timestamp: BigInt
 ): Claim {
   let id = getID(claimID, contract);
   let claim = Claim.load(id);
@@ -58,14 +58,13 @@ export function getOrCreateClaimToken(
 
   let id = getID(tokenID, contract);
   let fraction = ClaimToken.load(id);
-  let claim = getOrCreateClaim(claimID, contract);
 
   if (fraction == null) {
     let owner = minterContract.ownerOf(tokenID);
 
     fraction = new ClaimToken(id);
     fraction.owner = owner;
-    fraction.claim = claim.id;
+    fraction.claim = getID(claimID, contract);
     fraction.tokenID = tokenID;
     fraction.units = BigInt.fromI32(0);
     fraction.save();
