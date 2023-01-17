@@ -6,6 +6,7 @@ type Allowlist @entity {
 
 type Claim @entity {
   id: String!
+  creation: BigInt!
   tokenID: BigInt!
   contract: String!
   uri: String

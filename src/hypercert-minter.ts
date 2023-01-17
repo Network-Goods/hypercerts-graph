@@ -37,7 +37,11 @@ export function handleAllowlistCreated(event: AllowlistCreatedEvent): void {
 export function handleApprovalForAll(event: ApprovalForAllEvent): void {}
 
 export function handleClaimStored(event: ClaimStoredEvent): void {
-  let claim = getOrCreateClaim(event.params.claimID, event.address);
+  let claim = getOrCreateClaim(
+    event.params.claimID,
+    event.address,
+    event.block.timestamp
+  );
 
   claim.uri = event.params.uri;
   claim.creator = event.transaction.from;
