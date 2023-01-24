@@ -3,6 +3,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "codegen": "graph codegen",
+    "coverage": "graph test -- -c",
     "build": "graph build",
     "deploy": "graph deploy --node https://api.thegraph.com/deploy/ bitbeckers/hypercerts-dev",
     "create-local": "graph create --node http://localhost:8020/ bitbeckers/hypercerts-dev",

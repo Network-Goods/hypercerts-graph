@@ -13,6 +13,8 @@ import {
   getDefaultContractAddress,
 } from "./hypercert-minter-utils";
 
+export { handleAllowlistCreated };
+
 describe("Describe entity assertions", () => {
   beforeAll(() => {
     let tokenID = BigInt.fromI64(1);

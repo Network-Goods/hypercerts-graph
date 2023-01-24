@@ -19,6 +19,8 @@ import {
   getDefaultContractAddress,
 } from "./hypercert-minter-utils";
 
+export { handleTransferSingle, handleValueTransfer };
+
 describe("Describe entity assertions", () => {
   beforeAll(() => {});
 

@@ -13,6 +13,8 @@ import {
   getDefaultContractAddress,
 } from "./hypercert-minter-utils";
 
+export { handleClaimStored };
+
 describe("Describe entity assertions", () => {
   beforeAll(() => {
     let claimStoredEvent = createClaimStoredEvent(
