@@ -9,7 +9,7 @@ import {
   TransferSingle as TransferSingleEvent,
   URI as URIEvent,
   ValueTransfer as ValueTransferEvent,
-} from "../generated/templates/HypercertMinter/HypercertMinter";
+} from "../generated/HypercertMinter/HypercertMinter";
 import {
   getID,
   getOrCreateAllowlist,
@@ -97,13 +97,13 @@ export function handleValueTransfer(event: ValueTransferEvent): void {
 
   // Units transfer
   if (!from.tokenID.isZero() && !to.tokenID.isZero()) {
-    from.units.minus(value);
-    to.units.plus(value);
+    from.units = from.units.minus(value);
+    to.units = to.units.plus(value);
   }
 
   // Burn value
   if (!from.tokenID.isZero() && to.tokenID.isZero()) {
-    from.units.minus(value);
+    from.units = from.units.minus(value);
   }
 
   log.debug("Saving from: {}", [from.id]);

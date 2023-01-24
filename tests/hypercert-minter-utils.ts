@@ -2,114 +2,93 @@ import { newMockEvent } from "matchstick-as";
 import { ethereum, Address, BigInt, Bytes } from "@graphprotocol/graph-ts";
 import {
   AllowlistCreated,
-  ApprovalForAll,
+  BatchValueTransfer,
   ClaimStored,
-  Initialized,
   LeafClaimed,
-  OwnershipTransferred,
   TransferBatch,
   TransferSingle,
   URI,
   ValueTransfer,
 } from "../generated/HypercertMinter/HypercertMinter";
 
+export function getDefaultContractAddress(): Address {
+  return Address.fromString("0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7");
+}
+
 export function createAllowlistCreatedEvent(
-  claimID: BigInt,
+  tokenID: BigInt,
   root: Bytes
 ): AllowlistCreated {
-  let allowlistCreatedEvent = changetype<AllowlistCreated>(newMockEvent());
+  let mockEvent = newMockEvent();
+  let parameters: ethereum.EventParam[] = new Array();
 
-  allowlistCreatedEvent.parameters = new Array();
+  parameters = new Array();
 
-  allowlistCreatedEvent.parameters.push(
+  parameters.push(
     new ethereum.EventParam(
-      "claimID",
-      ethereum.Value.fromUnsignedBigInt(claimID)
+      "tokenID",
+      ethereum.Value.fromUnsignedBigInt(tokenID)
     )
   );
-  allowlistCreatedEvent.parameters.push(
+  parameters.push(
     new ethereum.EventParam("root", ethereum.Value.fromFixedBytes(root))
+  );
+
+  let allowlistCreatedEvent = new AllowlistCreated(
+    getDefaultContractAddress(),
+    mockEvent.logIndex,
+    mockEvent.transactionLogIndex,
+    mockEvent.logType,
+    mockEvent.block,
+    mockEvent.transaction,
+    parameters,
+    mockEvent.receipt
   );
 
   return allowlistCreatedEvent;
 }
 
-export function createApprovalForAllEvent(
-  account: Address,
-  operator: Address,
-  approved: boolean
-): ApprovalForAll {
-  let approvalForAllEvent = changetype<ApprovalForAll>(newMockEvent());
-
-  approvalForAllEvent.parameters = new Array();
-
-  approvalForAllEvent.parameters.push(
-    new ethereum.EventParam("account", ethereum.Value.fromAddress(account))
-  );
-  approvalForAllEvent.parameters.push(
-    new ethereum.EventParam("operator", ethereum.Value.fromAddress(operator))
-  );
-  approvalForAllEvent.parameters.push(
-    new ethereum.EventParam("approved", ethereum.Value.fromBoolean(approved))
-  );
-
-  return approvalForAllEvent;
-}
-
-export function createHypercertMinterBeaconUpgradedEvent(
-  beacon: Address
-): HypercertMinterBeaconUpgraded {
-  let hypercertMinterBeaconUpgradedEvent = changetype<
-    HypercertMinterBeaconUpgraded
-  >(newMockEvent());
-
-  hypercertMinterBeaconUpgradedEvent.parameters = new Array();
-
-  hypercertMinterBeaconUpgradedEvent.parameters.push(
-    new ethereum.EventParam("beacon", ethereum.Value.fromAddress(beacon))
-  );
-
-  return hypercertMinterBeaconUpgradedEvent;
-}
-
 export function createClaimStoredEvent(
   claimID: BigInt,
-  uri: string
+  uri: string,
+  totalUnits: BigInt
 ): ClaimStored {
-  let claimStoredEvent = changetype<ClaimStored>(newMockEvent());
+  let mockEvent = newMockEvent();
+  let parameters: ethereum.EventParam[] = new Array();
 
-  claimStoredEvent.parameters = new Array();
-
-  claimStoredEvent.parameters.push(
+  parameters.push(
     new ethereum.EventParam(
       "claimID",
       ethereum.Value.fromUnsignedBigInt(claimID)
     )
   );
-  claimStoredEvent.parameters.push(
+  parameters.push(
     new ethereum.EventParam("uri", ethereum.Value.fromString(uri))
+  );
+
+  parameters.push(
+    new ethereum.EventParam(
+      "totalUnits",
+      ethereum.Value.fromUnsignedBigInt(totalUnits)
+    )
+  );
+
+  let claimStoredEvent = new ClaimStored(
+    getDefaultContractAddress(),
+    mockEvent.logIndex,
+    mockEvent.transactionLogIndex,
+    mockEvent.logType,
+    mockEvent.block,
+    mockEvent.transaction,
+    parameters,
+    mockEvent.receipt
   );
 
   return claimStoredEvent;
 }
 
-export function createInitializedEvent(version: i32): Initialized {
-  let initializedEvent = changetype<Initialized>(newMockEvent());
-
-  initializedEvent.parameters = new Array();
-
-  initializedEvent.parameters.push(
-    new ethereum.EventParam(
-      "version",
-      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(version))
-    )
-  );
-
-  return initializedEvent;
-}
-
 export function createLeafClaimedEvent(
-  claimID: BigInt,
+  tokenID: BigInt,
   leaf: Bytes
 ): LeafClaimed {
   let leafClaimedEvent = changetype<LeafClaimed>(newMockEvent());
@@ -118,8 +97,8 @@ export function createLeafClaimedEvent(
 
   leafClaimedEvent.parameters.push(
     new ethereum.EventParam(
-      "claimID",
-      ethereum.Value.fromUnsignedBigInt(claimID)
+      "tokenID",
+      ethereum.Value.fromUnsignedBigInt(tokenID)
     )
   );
   leafClaimedEvent.parameters.push(
@@ -127,29 +106,6 @@ export function createLeafClaimedEvent(
   );
 
   return leafClaimedEvent;
-}
-
-export function createOwnershipTransferredEvent(
-  previousOwner: Address,
-  newOwner: Address
-): OwnershipTransferred {
-  let ownershipTransferredEvent = changetype<OwnershipTransferred>(
-    newMockEvent()
-  );
-
-  ownershipTransferredEvent.parameters = new Array();
-
-  ownershipTransferredEvent.parameters.push(
-    new ethereum.EventParam(
-      "previousOwner",
-      ethereum.Value.fromAddress(previousOwner)
-    )
-  );
-  ownershipTransferredEvent.parameters.push(
-    new ethereum.EventParam("newOwner", ethereum.Value.fromAddress(newOwner))
-  );
-
-  return ownershipTransferredEvent;
 }
 
 export function createTransferBatchEvent(
@@ -192,24 +148,34 @@ export function createTransferSingleEvent(
   id: BigInt,
   value: BigInt
 ): TransferSingle {
-  let transferSingleEvent = changetype<TransferSingle>(newMockEvent());
+  let mockEvent = newMockEvent();
+  let parameters: ethereum.EventParam[] = new Array();
 
-  transferSingleEvent.parameters = new Array();
-
-  transferSingleEvent.parameters.push(
+  parameters.push(
     new ethereum.EventParam("operator", ethereum.Value.fromAddress(operator))
   );
-  transferSingleEvent.parameters.push(
+  parameters.push(
     new ethereum.EventParam("from", ethereum.Value.fromAddress(from))
   );
-  transferSingleEvent.parameters.push(
+  parameters.push(
     new ethereum.EventParam("to", ethereum.Value.fromAddress(to))
   );
-  transferSingleEvent.parameters.push(
+  parameters.push(
     new ethereum.EventParam("id", ethereum.Value.fromUnsignedBigInt(id))
   );
-  transferSingleEvent.parameters.push(
+  parameters.push(
     new ethereum.EventParam("value", ethereum.Value.fromUnsignedBigInt(value))
+  );
+
+  let transferSingleEvent = new TransferSingle(
+    getDefaultContractAddress(),
+    mockEvent.logIndex,
+    mockEvent.transactionLogIndex,
+    mockEvent.logType,
+    mockEvent.block,
+    mockEvent.transaction,
+    parameters,
+    mockEvent.receipt
   );
 
   return transferSingleEvent;
@@ -250,28 +216,46 @@ export function createHypercertMinterUpgradedEvent(
 }
 
 export function createValueTransferEvent(
+  claimID: BigInt,
   fromTokenID: BigInt,
   toTokenID: BigInt,
   value: BigInt
 ): ValueTransfer {
-  let valueTransferEvent = changetype<ValueTransfer>(newMockEvent());
+  let mockEvent = newMockEvent();
+  let parameters: ethereum.EventParam[] = new Array();
 
-  valueTransferEvent.parameters = new Array();
+  parameters.push(
+    new ethereum.EventParam(
+      "claimID",
+      ethereum.Value.fromUnsignedBigInt(claimID)
+    )
+  );
 
-  valueTransferEvent.parameters.push(
+  parameters.push(
     new ethereum.EventParam(
       "fromTokenID",
       ethereum.Value.fromUnsignedBigInt(fromTokenID)
     )
   );
-  valueTransferEvent.parameters.push(
+  parameters.push(
     new ethereum.EventParam(
       "toTokenID",
       ethereum.Value.fromUnsignedBigInt(toTokenID)
     )
   );
-  valueTransferEvent.parameters.push(
+  parameters.push(
     new ethereum.EventParam("value", ethereum.Value.fromUnsignedBigInt(value))
+  );
+
+  let valueTransferEvent = new ValueTransfer(
+    getDefaultContractAddress(),
+    mockEvent.logIndex,
+    mockEvent.transactionLogIndex,
+    mockEvent.logType,
+    mockEvent.block,
+    mockEvent.transaction,
+    parameters,
+    mockEvent.receipt
   );
 
   return valueTransferEvent;

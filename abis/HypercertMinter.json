@@ -46,6 +46,11 @@
   },
   {
     "inputs": [],
+    "name": "TransfersNotAllowed",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "TypeMismatch",
     "type": "error"
   },
@@ -110,6 +115,37 @@
       }
     ],
     "name": "ApprovalForAll",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256[]",
+        "name": "claimIDs",
+        "type": "uint256[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256[]",
+        "name": "fromTokenIDs",
+        "type": "uint256[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256[]",
+        "name": "toTokenIDs",
+        "type": "uint256[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256[]",
+        "name": "values",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "BatchValueTransfer",
     "type": "event"
   },
   {
@@ -442,6 +478,29 @@
   {
     "inputs": [
       {
+        "internalType": "bytes32[][]",
+        "name": "proofs",
+        "type": "bytes32[][]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "claimIDs",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "units",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "batchMintClaimsFromAllowlists",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "account",
         "type": "address"
@@ -519,6 +578,11 @@
         "internalType": "string",
         "name": "_uri",
         "type": "string"
+      },
+      {
+        "internalType": "enum IHypercertToken.TransferRestrictions",
+        "name": "restrictions",
+        "type": "uint8"
       }
     ],
     "name": "createAllowlist",
@@ -634,6 +698,11 @@
         "internalType": "string",
         "name": "_uri",
         "type": "string"
+      },
+      {
+        "internalType": "enum IHypercertToken.TransferRestrictions",
+        "name": "restrictions",
+        "type": "uint8"
       }
     ],
     "name": "mintClaim",
@@ -680,6 +749,11 @@
         "internalType": "string",
         "name": "_uri",
         "type": "string"
+      },
+      {
+        "internalType": "enum IHypercertToken.TransferRestrictions",
+        "name": "restrictions",
+        "type": "uint8"
       }
     ],
     "name": "mintClaimWithFractions",

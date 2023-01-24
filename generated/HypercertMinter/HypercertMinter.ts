@@ -80,6 +80,36 @@ export class ApprovalForAll__Params {
   }
 }
 
+export class BatchValueTransfer extends ethereum.Event {
+  get params(): BatchValueTransfer__Params {
+    return new BatchValueTransfer__Params(this);
+  }
+}
+
+export class BatchValueTransfer__Params {
+  _event: BatchValueTransfer;
+
+  constructor(event: BatchValueTransfer) {
+    this._event = event;
+  }
+
+  get claimIDs(): Array<BigInt> {
+    return this._event.parameters[0].value.toBigIntArray();
+  }
+
+  get fromTokenIDs(): Array<BigInt> {
+    return this._event.parameters[1].value.toBigIntArray();
+  }
+
+  get toTokenIDs(): Array<BigInt> {
+    return this._event.parameters[2].value.toBigIntArray();
+  }
+
+  get values(): Array<BigInt> {
+    return this._event.parameters[3].value.toBigIntArray();
+  }
+}
+
 export class BeaconUpgraded extends ethereum.Event {
   get params(): BeaconUpgraded__Params {
     return new BeaconUpgraded__Params(this);
@@ -786,6 +816,44 @@ export class __Upgradeable1155_initCall__Outputs {
   }
 }
 
+export class BatchMintClaimsFromAllowlistsCall extends ethereum.Call {
+  get inputs(): BatchMintClaimsFromAllowlistsCall__Inputs {
+    return new BatchMintClaimsFromAllowlistsCall__Inputs(this);
+  }
+
+  get outputs(): BatchMintClaimsFromAllowlistsCall__Outputs {
+    return new BatchMintClaimsFromAllowlistsCall__Outputs(this);
+  }
+}
+
+export class BatchMintClaimsFromAllowlistsCall__Inputs {
+  _call: BatchMintClaimsFromAllowlistsCall;
+
+  constructor(call: BatchMintClaimsFromAllowlistsCall) {
+    this._call = call;
+  }
+
+  get proofs(): Array<Array<Bytes>> {
+    return this._call.inputValues[0].value.toBytesMatrix();
+  }
+
+  get claimIDs(): Array<BigInt> {
+    return this._call.inputValues[1].value.toBigIntArray();
+  }
+
+  get units(): Array<BigInt> {
+    return this._call.inputValues[2].value.toBigIntArray();
+  }
+}
+
+export class BatchMintClaimsFromAllowlistsCall__Outputs {
+  _call: BatchMintClaimsFromAllowlistsCall;
+
+  constructor(call: BatchMintClaimsFromAllowlistsCall) {
+    this._call = call;
+  }
+}
+
 export class BurnCall extends ethereum.Call {
   get inputs(): BurnCall__Inputs {
     return new BurnCall__Inputs(this);
@@ -924,6 +992,10 @@ export class CreateAllowlistCall__Inputs {
   get _uri(): string {
     return this._call.inputValues[2].value.toString();
   }
+
+  get restrictions(): i32 {
+    return this._call.inputValues[3].value.toI32();
+  }
 }
 
 export class CreateAllowlistCall__Outputs {
@@ -1014,6 +1086,10 @@ export class MintClaimCall__Inputs {
   get _uri(): string {
     return this._call.inputValues[1].value.toString();
   }
+
+  get restrictions(): i32 {
+    return this._call.inputValues[2].value.toI32();
+  }
 }
 
 export class MintClaimCall__Outputs {
@@ -1089,6 +1165,10 @@ export class MintClaimWithFractionsCall__Inputs {
 
   get _uri(): string {
     return this._call.inputValues[2].value.toString();
+  }
+
+  get restrictions(): i32 {
+    return this._call.inputValues[3].value.toI32();
   }
 }
 

@@ -1,6 +1,6 @@
 import { Address, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
 import { Allowlist, Claim, ClaimToken } from "../generated/schema";
-import { HypercertMinter } from "../generated/templates/HypercertMinter/HypercertMinter";
+import { HypercertMinter } from "../generated/HypercertMinter/HypercertMinter";
 
 export function getID(tokenID: BigInt, contract: Address): string {
   return contract.toHexString().concat("-".concat(tokenID.toString()));
