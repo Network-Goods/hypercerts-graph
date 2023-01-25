@@ -12,14 +12,19 @@ import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   handleTransferSingle,
   handleValueTransfer,
+  handleBatchValueTransfer,
 } from "../src/hypercert-minter";
 import {
+  buildIDs,
+  buildValues,
+  buildZeroes,
+  createBatchValueTransferEvent,
   createTransferSingleEvent,
   createValueTransferEvent,
   getDefaultContractAddress,
 } from "./hypercert-minter-utils";
 
-export { handleTransferSingle, handleValueTransfer };
+export { handleTransferSingle, handleValueTransfer, handleBatchValueTransfer };
 
 describe("Describe entity assertions", () => {
   beforeAll(() => {});
@@ -238,5 +243,66 @@ describe("Describe entity assertions", () => {
     assert.fieldEquals("ClaimToken", fractionIdOne, "units", "0");
     assert.fieldEquals("ClaimToken", fractionIdTwo, "tokenID", "2");
     assert.fieldEquals("ClaimToken", fractionIdTwo, "units", "10000");
+  });
+
+  test("BatchTransferValue for non-existent tokens generates the claim tokens AND no other entities", () => {
+    assert.entityCount("Allowlist", 0);
+    assert.entityCount("Claim", 0);
+    assert.entityCount("ClaimToken", 0);
+
+    let from = Address.fromString("0x0000000000000000000000000000000000000001");
+    let size = BigInt.fromI64(5);
+    let claimIDs = buildIDs(size);
+    let fromIDs = buildZeroes(size);
+    let toIDs = buildIDs(size);
+    let values = buildValues(size);
+
+    let batchValueTransferEvent = createBatchValueTransferEvent(
+      claimIDs,
+      fromIDs,
+      toIDs,
+      values
+    );
+
+    for (let i = 0; i < size.toI64(); i++) {
+      createMockedFunction(
+        getDefaultContractAddress(),
+        "ownerOf",
+        "ownerOf(uint256):(address)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(toIDs[i])])
+        .returns([ethereum.Value.fromAddress(from)]);
+
+      createMockedFunction(
+        getDefaultContractAddress(),
+        "ownerOf",
+        "ownerOf(uint256):(address)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(fromIDs[i])])
+        .returns([ethereum.Value.fromAddress(from)]);
+    }
+
+    handleBatchValueTransfer(batchValueTransferEvent);
+
+    assert.entityCount("Allowlist", 0);
+    assert.entityCount("Claim", 0);
+    //TODO also build 0 token..
+    assert.entityCount("ClaimToken", 6);
+
+    let fractionId = getDefaultContractAddress()
+      .toHexString()
+      .concat("-1");
+
+    assert.fieldEquals("ClaimToken", fractionId, "tokenID", "1");
+    assert.fieldEquals(
+      "ClaimToken",
+      fractionId,
+      "claim",
+      getDefaultContractAddress()
+        .toHexString()
+        .concat("-1")
+    );
+    assert.fieldEquals("ClaimToken", fractionId, "owner", from.toHexString());
+    assert.fieldEquals("ClaimToken", fractionId, "units", "200"); //function of buildValues (100 + i * 100)
   });
 });

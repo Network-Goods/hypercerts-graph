@@ -15,6 +15,43 @@ export function getDefaultContractAddress(): Address {
   return Address.fromString("0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7");
 }
 
+export function buildZeroes(size: BigInt): BigInt[] {
+  let array: BigInt[] = [];
+  for (let i = 0; i < size.toI32(); i++) {
+    let value = BigInt.zero();
+
+    array.push(value);
+  }
+
+  return array;
+}
+
+export function buildIDs(
+  size: BigInt,
+  start: BigInt = BigInt.zero()
+): BigInt[] {
+  let array: BigInt[] = [];
+  for (let i = 0; i < size.toI32(); i++) {
+    let index = start.plus(BigInt.fromI64(i)).plus(BigInt.fromI64(1));
+    array.push(index);
+  }
+
+  return array;
+}
+
+export function buildValues(size: BigInt): BigInt[] {
+  let array: BigInt[] = [];
+  for (let i = 0; i < size.toI32(); i++) {
+    let value = BigInt.fromI64(100)
+      .plus(BigInt.fromI64(i))
+      .plus(BigInt.fromI64(100));
+
+    array.push(value);
+  }
+
+  return array;
+}
+
 export function createAllowlistCreatedEvent(
   tokenID: BigInt,
   root: Bytes
@@ -259,4 +296,52 @@ export function createValueTransferEvent(
   );
 
   return valueTransferEvent;
+}
+
+export function createBatchValueTransferEvent(
+  claimIDs: BigInt[],
+  fromTokenIDs: BigInt[],
+  toTokenIDs: BigInt[],
+  values: BigInt[]
+): BatchValueTransfer {
+  let mockEvent = newMockEvent();
+  let parameters: ethereum.EventParam[] = new Array();
+
+  parameters.push(
+    new ethereum.EventParam(
+      "claimIDs",
+      ethereum.Value.fromUnsignedBigIntArray(claimIDs)
+    )
+  );
+  parameters.push(
+    new ethereum.EventParam(
+      "fromTokenIDs",
+      ethereum.Value.fromUnsignedBigIntArray(fromTokenIDs)
+    )
+  );
+  parameters.push(
+    new ethereum.EventParam(
+      "toTokenIDs",
+      ethereum.Value.fromUnsignedBigIntArray(toTokenIDs)
+    )
+  );
+  parameters.push(
+    new ethereum.EventParam(
+      "values",
+      ethereum.Value.fromUnsignedBigIntArray(values)
+    )
+  );
+
+  let batchValueTransferEvent = new BatchValueTransfer(
+    getDefaultContractAddress(),
+    mockEvent.logIndex,
+    mockEvent.transactionLogIndex,
+    mockEvent.logType,
+    mockEvent.block,
+    mockEvent.transaction,
+    parameters,
+    mockEvent.receipt
+  );
+
+  return batchValueTransferEvent;
 }
