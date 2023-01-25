@@ -1,6 +1,7 @@
 import {
   AllowlistCreated as AllowlistCreatedEvent,
   ApprovalForAll as ApprovalForAllEvent,
+  BatchValueTransfer,
   ClaimStored as ClaimStoredEvent,
   Initialized as InitializedEvent,
   LeafClaimed as LeafClaimedEvent,
@@ -111,4 +112,43 @@ export function handleValueTransfer(event: ValueTransferEvent): void {
 
   from.save();
   to.save();
+}
+
+//TODO cleanup to nicer state handling
+export function handleBatchValueTransfer(event: BatchValueTransfer): void {
+  let claimIDs = event.params.claimIDs;
+  let fromIDs = event.params.fromTokenIDs;
+  let toIDs = event.params.toTokenIDs;
+  let values = event.params.values;
+
+  let size = claimIDs.length;
+
+  for (let i = 0; i < size; i++) {
+    let from = getOrCreateClaimToken(claimIDs[i], fromIDs[i], event.address);
+    let to = getOrCreateClaimToken(claimIDs[i], toIDs[i], event.address);
+
+    let value = values[i];
+
+    // New mint
+    if (from.tokenID.isZero() && !to.tokenID.isZero()) {
+      to.units = value;
+    }
+
+    // Units transfer
+    if (!from.tokenID.isZero() && !to.tokenID.isZero()) {
+      from.units = from.units.minus(value);
+      to.units = to.units.plus(value);
+    }
+
+    // Burn value
+    if (!from.tokenID.isZero() && to.tokenID.isZero()) {
+      from.units = from.units.minus(value);
+    }
+
+    log.debug("Saving from: {}", [from.id]);
+    log.debug("Saving to: {}", [to.id]);
+
+    from.save();
+    to.save();
+  }
 }
