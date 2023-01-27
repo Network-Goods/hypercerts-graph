@@ -216,6 +216,24 @@ export class OwnershipTransferred__Params {
   }
 }
 
+export class Paused extends ethereum.Event {
+  get params(): Paused__Params {
+    return new Paused__Params(this);
+  }
+}
+
+export class Paused__Params {
+  _event: Paused;
+
+  constructor(event: Paused) {
+    this._event = event;
+  }
+
+  get account(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+}
+
 export class TransferBatch extends ethereum.Event {
   get params(): TransferBatch__Params {
     return new TransferBatch__Params(this);
@@ -306,6 +324,24 @@ export class URI__Params {
   }
 }
 
+export class Unpaused extends ethereum.Event {
+  get params(): Unpaused__Params {
+    return new Unpaused__Params(this);
+  }
+}
+
+export class Unpaused__Params {
+  _event: Unpaused;
+
+  constructor(event: Unpaused) {
+    this._event = event;
+  }
+
+  get account(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+}
+
 export class Upgraded extends ethereum.Event {
   get params(): Upgraded__Params {
     return new Upgraded__Params(this);
@@ -357,55 +393,6 @@ export class ValueTransfer__Params {
 export class HypercertMinter extends ethereum.SmartContract {
   static bind(address: Address): HypercertMinter {
     return new HypercertMinter("HypercertMinter", address);
-  }
-
-  NF_INDEX_MASK(): BigInt {
-    let result = super.call("NF_INDEX_MASK", "NF_INDEX_MASK():(uint256)", []);
-
-    return result[0].toBigInt();
-  }
-
-  try_NF_INDEX_MASK(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "NF_INDEX_MASK",
-      "NF_INDEX_MASK():(uint256)",
-      []
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  TYPE_MASK(): BigInt {
-    let result = super.call("TYPE_MASK", "TYPE_MASK():(uint256)", []);
-
-    return result[0].toBigInt();
-  }
-
-  try_TYPE_MASK(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("TYPE_MASK", "TYPE_MASK():(uint256)", []);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  TYPE_NF_BIT(): BigInt {
-    let result = super.call("TYPE_NF_BIT", "TYPE_NF_BIT():(uint256)", []);
-
-    return result[0].toBigInt();
-  }
-
-  try_TYPE_NF_BIT(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("TYPE_NF_BIT", "TYPE_NF_BIT():(uint256)", []);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
   balanceOf(account: Address, id: BigInt): BigInt {
@@ -617,6 +604,21 @@ export class HypercertMinter extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
+  paused(): boolean {
+    let result = super.call("paused", "paused():(bool)", []);
+
+    return result[0].toBoolean();
+  }
+
+  try_paused(): ethereum.CallResult<boolean> {
+    let result = super.tryCall("paused", "paused():(bool)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
+  }
+
   proxiableUUID(): Bytes {
     let result = super.call("proxiableUUID", "proxiableUUID():(bytes32)", []);
 
@@ -657,21 +659,6 @@ export class HypercertMinter extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toBoolean());
-  }
-
-  typeCounter(): BigInt {
-    let result = super.call("typeCounter", "typeCounter():(uint256)", []);
-
-    return result[0].toBigInt();
-  }
-
-  try_typeCounter(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("typeCounter", "typeCounter():(uint256)", []);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
   unitsOf(account: Address, tokenID: BigInt): BigInt {
@@ -1180,6 +1167,32 @@ export class MintClaimWithFractionsCall__Outputs {
   }
 }
 
+export class PauseCall extends ethereum.Call {
+  get inputs(): PauseCall__Inputs {
+    return new PauseCall__Inputs(this);
+  }
+
+  get outputs(): PauseCall__Outputs {
+    return new PauseCall__Outputs(this);
+  }
+}
+
+export class PauseCall__Inputs {
+  _call: PauseCall;
+
+  constructor(call: PauseCall) {
+    this._call = call;
+  }
+}
+
+export class PauseCall__Outputs {
+  _call: PauseCall;
+
+  constructor(call: PauseCall) {
+    this._call = call;
+  }
+}
+
 export class RenounceOwnershipCall extends ethereum.Call {
   get inputs(): RenounceOwnershipCall__Inputs {
     return new RenounceOwnershipCall__Inputs(this);
@@ -1269,23 +1282,23 @@ export class SafeTransferFromCall__Inputs {
     this._call = call;
   }
 
-  get _from(): Address {
+  get from(): Address {
     return this._call.inputValues[0].value.toAddress();
   }
 
-  get _to(): Address {
+  get to(): Address {
     return this._call.inputValues[1].value.toAddress();
   }
 
-  get _id(): BigInt {
+  get id(): BigInt {
     return this._call.inputValues[2].value.toBigInt();
   }
 
-  get _value(): BigInt {
+  get amount(): BigInt {
     return this._call.inputValues[3].value.toBigInt();
   }
 
-  get _data(): Bytes {
+  get data(): Bytes {
     return this._call.inputValues[4].value.toBytes();
   }
 }
@@ -1396,6 +1409,32 @@ export class TransferOwnershipCall__Outputs {
   _call: TransferOwnershipCall;
 
   constructor(call: TransferOwnershipCall) {
+    this._call = call;
+  }
+}
+
+export class UnpauseCall extends ethereum.Call {
+  get inputs(): UnpauseCall__Inputs {
+    return new UnpauseCall__Inputs(this);
+  }
+
+  get outputs(): UnpauseCall__Outputs {
+    return new UnpauseCall__Outputs(this);
+  }
+}
+
+export class UnpauseCall__Inputs {
+  _call: UnpauseCall;
+
+  constructor(call: UnpauseCall) {
+    this._call = call;
+  }
+}
+
+export class UnpauseCall__Outputs {
+  _call: UnpauseCall;
+
+  constructor(call: UnpauseCall) {
     this._call = call;
   }
 }
